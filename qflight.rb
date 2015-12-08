@@ -4,7 +4,8 @@ require 'sinatra/base'
 require 'omniauth-oauth2'
 require 'omniauth-google-oauth2'
 require 'logger'
-
+require 'json'
+require 'open3'
 
 
 class Qflight < Sinatra::Base
@@ -32,6 +33,20 @@ class Qflight < Sinatra::Base
 	  def current_user
 	  	session[:user]
 	  end
+
+	  def remove_empty_keys!(hash)
+      hash.each_key do |key|
+        if hash[key].is_a? Array
+          hash[key].each {|arr| remove_empty_keys!(arr) if arr.is_a? Hash }
+        elsif hash[key].is_a? Hash
+          remove_empty_keys!(hash[key])
+        else
+          hash.delete(key) if hash[key].nil? or hash[key] == ""
+        end
+      end
+      hash
+    end
+
 	end
 
 	before do
@@ -72,5 +87,39 @@ class Qflight < Sinatra::Base
 	get '/profile' do
 		@user = session[:user]
 		erb :profile
+	end
+
+	post '/search' do
+		search_params = params.clone
+		remove_empty_keys!(search_params)
+		slice = []
+		if search_params["journey"]["direction"] == "roundtrip"
+			slice << {
+				"origin"=>search_params["journey"]["origin"],
+				"destination"=>search_params["journey"]["destination"],
+				"date"=>search_params["journey"]["date"],
+			}
+			slice << {
+				"origin"=>search_params["journey"]["destination"],
+				"destination"=>search_params["journey"]["origin"],
+				"date"=>search_params["journey"]["r_date"],
+			}
+		elsif search_params["journey"]["direction"] == "oneway"
+			slice << {
+				"origin"=>search_params["journey"]["origin"],
+				"destination"=>search_params["journey"]["destination"],
+				"date"=>search_params["journey"]["date"],
+			}
+		end
+
+		request = {
+			"request"=>{
+				"passengers" => search_params["passengers"],
+				"slice" => slice
+			}
+		}
+		puts "https://www.googleapis.com/qpxExpress/v1/trips/search?access_token=#{session[:credentials]['token']}"
+		response = `curl -d '#{request.to_json}' -H "Content-Type: application/json" https://www.googleapis.com/qpxExpress/v1/trips/search?access_token=#{session[:credentials]['token']} 2>&1 | less`
+		response.inspect
 	end
 end

@@ -1,22 +1,70 @@
 <legend>Search Flights</legend>
 <div class="box">
-	<form>
+	<form action="/search" method="post">
 		<div class="form-group">
 			<label for="orgin">Origin</label> 
-			<input type="text" class="form-control" id="orgin" placeholder="Enter Origin Airport Code"> 
+			<input type="text" class="form-control" id="orgin" name='journey[origin]' placeholder="Enter Origin Airport Code"> 
 		</div>
 		<div class="form-group">
 			<label for="destination">Destination</label> 
-			<input type="text" class="form-control" id="destination" placeholder="Enter Destination Airport Code"> 
+			<input type="text" class="form-control" id="destination" name='journey[destination]' placeholder="Enter Destination Airport Code"> 
 		</div>
 		<div class="form-group">
 			<label for="adultCount">No. of Adults</label> 
-			<input type="number" class="form-control" min="1" max="10" id="adultCount"> 
+			<input type="number" class="form-control" min="1" max="10" name='passengers[adultCount]' id="adultCount"> 
 		</div>
 		<div class="form-group">
 			<label for="childCount">No. of Children</label> 
-			<input type="number" class="form-control" min="0" max="10" id="childCount"> 
+			<input type="number" class="form-control" min="0" max="10" name='passengers[childCount]' id="childCount"> 
+		</div>
+		<div class="form-group">
+			<select class="form-control journey_direction" name='journey[direction]'>
+				<option value=''>-- Select Journey Type --</option>
+			  <option value='oneway'>One Way</option>
+			  <option value='roundtrip'>Round Trip</option>
+			</select>
+		</div>
+		<div class="form-group">
+			<input type="text" id="onwards_date" name='journey[date]' placeholder="Journey Date">
+			</br></br>
+			<input type="text" id="return_date" name='journey[r_date]' placeholder="Return Journey Date">
 		</div>
 		<button type="submit" class="btn btn-default">Search</button>
 	</form>
 </div>
+<script>
+	$(document).ready(function(){
+
+		if ($(".journey_direction").val() == ""){
+			$('#onwards_date').hide()
+      $("#onwards_date").val("")
+      $('#return_date').hide()
+      $("#return_date").val("")
+		}
+
+		$(".journey_direction").change(function(){
+		 	if($(this).val() == "oneway"){
+		 		$('#onwards_date').show()
+		 		$('#return_date').hide()
+        $("#return_date").val("")
+		 	}
+		 	else if ($(this).val() == "roundtrip"){
+		 		$('#onwards_date').show()
+		 		$('#return_date').show()
+		 	}
+		 	else{
+		 		$('#onwards_date').hide()
+	      $("#onwards_date").val("")
+	      $('#return_date').hide()
+	      $("#return_date").val("")
+		 	}
+		});
+
+		$("#onwards_date").datepicker({
+		    dateFormat: "yy-mm-dd"
+		});
+		$("#return_date").datepicker({
+		    dateFormat: "yy-mm-dd"
+		});
+	});
+</script>
