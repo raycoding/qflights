@@ -1,0 +1,12 @@
+<table class="table table-bordered">
+	<tbody>
+		<% @user.each_pair do |key,value| %>
+			<% next if ["kind","sub","given_name","email_verified","urls"].include?(key) %>
+			<% if key == "image" %>
+				<tr><td><%= key %><td><img src="<%= value %>"></img></td></tr>
+			<% else %>
+				<tr><td><%= key %><td><%= value %></td></tr>
+			<% end %>
+		<% end %>
+	</tbody>
+</table>
