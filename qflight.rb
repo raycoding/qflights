@@ -1,29 +1,29 @@
 # encoding: UTF-8
 require 'rubygems' if RUBY_VERSION < "1.9"
+require 'bundler/setup'
 require 'sinatra/base'
 require 'omniauth-oauth2'
 require 'omniauth-google-oauth2'
 require 'logger'
 require 'json'
 require 'open3'
-
+require File.expand_path '../config/app_config.rb', __FILE__
 
 class Qflight < Sinatra::Base
 
 	configure do
-		config = YAML.load_file 'config/credentials.yml'
 
 		set :public_folder, File.dirname(__FILE__) + '/public'
 	
-		use Rack::Session::Cookie, :key => 'rack.session', :path => '/', :secret => config['SESSION_SECRET']
+		use Rack::Session::Cookie, :key => 'rack.session', :path => '/', :secret => CONFIG['QFLIGHTS_SESSION_SECRET']
 
 		use OmniAuth::Builder do
-	  	provider :google_oauth2, config['GOOGLE_CLIENT_ID'], config['GOOGLE_CLIENT_SECRET'], {
-	      :scope => "email, profile"
+	  	provider :google_oauth2, CONFIG['QFLIGHTS_GOOGLE_CLIENT_ID'], CONFIG['QFLIGHTS_GOOGLE_CLIENT_SECRET'], {
+	      :scope => "email, profile",
+	      :access_type => "online"
 	    }
 		end
 	end
-
 
 	helpers do
 	  def current_user?
@@ -118,8 +118,7 @@ class Qflight < Sinatra::Base
 				"slice" => slice
 			}
 		}
-		puts "https://www.googleapis.com/qpxExpress/v1/trips/search?access_token=#{session[:credentials]['token']}"
-		response = `curl -d '#{request.to_json}' -H "Content-Type: application/json" https://www.googleapis.com/qpxExpress/v1/trips/search?access_token=#{session[:credentials]['token']} 2>&1 | less`
+		response = `curl -d '#{request.to_json}' -H "Content-Type: application/json" https://www.googleapis.com/qpxExpress/v1/trips/search?key=#{CONFIG['QFLIGHTS_API_KEY']} 2>&1 | less`
 		response.inspect
 	end
 end
