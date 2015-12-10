@@ -36,4 +36,4 @@ class HashStruct
   end
 end
 
-CONFIG = HashStruct.new(YAML::load(ERB.new(File.read(File.join(File.dirname(__FILE__),"credentials.yml.erb"))).result))
+CONFIG = HashStruct.new(YAML::load(ERB.new(File.read(File.join(File.dirname(__FILE__),"config.yml.erb"))).result))

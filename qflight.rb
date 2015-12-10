@@ -8,6 +8,8 @@ require 'logger'
 require 'json'
 require 'open3'
 require File.expand_path '../config/app_config.rb', __FILE__
+require 'uri'
+require 'net/http'
 
 class Qflight < Sinatra::Base
 
@@ -118,7 +120,13 @@ class Qflight < Sinatra::Base
 				"slice" => slice
 			}
 		}
-		response = `curl -d '#{request.to_json}' -H "Content-Type: application/json" https://www.googleapis.com/qpxExpress/v1/trips/search?key=#{CONFIG['QFLIGHTS_API_KEY']} 2>&1 | less`
-		response.inspect
+		uri = URI("#{CONFIG['GOOGLE_API_HOST']}")
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    req = Net::HTTP::Post.new("#{CONFIG['QFLIGHTS_API_PATH']}?key=#{CONFIG['QFLIGHTS_API_KEY']}",{'Content-Type' =>'application/json'})
+    req.body = request.to_json
+    res = http.request(req)
+    res.body
 	end
 end
