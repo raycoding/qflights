@@ -1,3 +1,5 @@
+This is a demo sample Sinatra & Ruby App using Google QPX Express API for Flights Search
+
 # Setup App
  - This runs on Ruby 2.1.2, so make sure to install 2.1.2 version.
  - cd $APP and bundle install
@@ -24,3 +26,6 @@
 
 #Note
   Although QPX Express Airfare API supports OAuth 2.0 access token they haven't mentioned the scope that needs to be written for it, so currently I have tried with access token of OAuth 2.0 but it does not work for Flights Search so I used the other way of using their API by creating a Public API Key i.e Browser Key (QFLIGHTS_API_KEY). Once their documentation is clear about the scope to be provided for OAuth 2.0 access token way of doing it would suggest you to implement that instead of API Key
+  
+# Google QPX Express API for Flights Search
+  Read more here https://developers.google.com/qpx-express/
