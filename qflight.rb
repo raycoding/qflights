@@ -92,6 +92,7 @@ class Qflight < Sinatra::Base
 	end
 
 	post '/search' do
+		content_type :json
 		search_params = params.clone
 		remove_empty_keys!(search_params)
 		slice = []
